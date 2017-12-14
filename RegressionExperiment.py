@@ -59,14 +59,14 @@ def gradientDecent(X,y,w,alpha,lamb,num_rounds,X_test,y_test):
         
     return w,train_loss_history,val_loss_history
 
-def NAG(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
+def NAG(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test,batch_size=1000):
     train_loss_history = []
     test_loss_history = []
 
     yy = 0.9
     v = np.zeros(w.shape)
     for i in range(num_rounds):
-        random = list(set(np.random.randint(0,X_train.shape[0],size=100)))
+        random = list(set(np.random.randint(0,X_train.shape[0],size=batch_size)))
         dx = X_train[random]
         dy = y_train[random]
 
@@ -78,7 +78,7 @@ def NAG(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
         test_loss_history.append(loss(X_test,y_test,w,lamb))
     return w,train_loss_history,test_loss_history
 
-def RMSProp(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
+def RMSProp(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test,batch_size=1000):
     train_loss_history = []
     test_loss_history = []
 
@@ -88,7 +88,7 @@ def RMSProp(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
     gama = 0.001
 
     for i in range(num_rounds):
-        random = list(set(np.random.randint(0,X_train.shape[0],size=100)))
+        random = list(set(np.random.randint(0,X_train.shape[0],size=batch_size)))
         dx = X_train[random]
         dy = y_train[random]
 
@@ -101,7 +101,7 @@ def RMSProp(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
     
     return w,train_loss_history,test_loss_history
 
-def AdaDelta(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
+def AdaDelta(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test,batch_size=1000):
     train_loss_history = []
     test_loss_history = []
 
@@ -112,7 +112,7 @@ def AdaDelta(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
 
 
     for i in range(num_rounds):
-        random = list(set(np.random.randint(0,X_train.shape[0],size=100)))
+        random = list(set(np.random.randint(0,X_train.shape[0],size=batch_size)))
         dx = X_train[random]
         dy = y_train[random]
 
@@ -129,7 +129,7 @@ def AdaDelta(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
     return w,train_loss_history,test_loss_history
 
 
-def Adam(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
+def Adam(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test,batch_size=1000):
     train_loss_history = []
     test_loss_history = []
     beta1 = 0.85
@@ -141,7 +141,7 @@ def Adam(X_train,y_train,w,alpha,lamb,num_rounds,X_test,y_test):
 
     for i in range(num_rounds):
 
-        random = list(set(np.random.randint(0,X_train.shape[0],size=100)))
+        random = list(set(np.random.randint(0,X_train.shape[0],size=batch_size)))
         dx = X_train[random]
         dy = y_train[random]
 
@@ -167,17 +167,18 @@ def train(X,y,X_test,y_test):
     alpha=0.01
     num_rounds=3000
     lamb = 1
+    batch_size=3000
     w,train_loss_history,grad_loss_history = gradientDecent(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test)
     print('grad acc', predict(X_test,y_test,w))
-    w,train_loss_history,NAG_loss_history = NAG(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test)
+    w,train_loss_history,NAG_loss_history = NAG(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test,batch_size=batch_size)
     print('NAG acc', predict(X_test,y_test,w))
-    w,train_loss_history,RMSProp_loss_history = RMSProp(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test)
+    w,train_loss_history,RMSProp_loss_history = RMSProp(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test,batch_size=batch_size)
     print('RMSProp acc', predict(X_test,y_test,w))
-    w,train_loss_history,AdaDelta_loss_history = AdaDelta(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test)
+    w,train_loss_history,AdaDelta_loss_history = AdaDelta(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test,batch_size=batch_size)
     print('AdaDelta acc', predict(X_test,y_test,w))
-    w,train_loss_history,Adam_loss_history = Adam(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test)
+    w,train_loss_history,Adam_loss_history = Adam(X,y,init_w,alpha,lamb,num_rounds,X_test,y_test,batch_size=batch_size)
     print('Adam acc', predict(X_test,y_test,w))
-    plt.plot(np.arange(num_rounds),grad_loss_history,label='NAG loss')
+    plt.plot(np.arange(num_rounds),grad_loss_history,label='train loss')
     plt.plot(np.arange(num_rounds),NAG_loss_history,label='NAG loss')
     plt.plot(np.arange(num_rounds),RMSProp_loss_history,label='RMSProp loss')
     plt.plot(np.arange(num_rounds),AdaDelta_loss_history,label='AdaDelta loss')
